@@ -9,7 +9,7 @@ const socket = require('./socket');
 
 const debug = Debug('@feathersjs/authentication:index');
 
-function init (config = {}) {
+function init (config = {}, afterware = false) {
   return function authentication () {
     const app = this;
     const _super = app.setup;
@@ -51,7 +51,7 @@ function init (config = {}) {
 
     // TODO (EK): Support passing your own service or force
     // developer to register it themselves.
-    app.configure(service(options));
+    app.configure(service(options, afterware));
     app.passport.initialize();
 
     app.setup = function () {

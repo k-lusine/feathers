@@ -40,7 +40,7 @@ class Service {
   }
 }
 
-module.exports = function init (options) {
+module.exports = function init (options, afterware) {
   return function () {
     const app = this;
     const path = options.path;
@@ -51,6 +51,9 @@ module.exports = function init (options) {
       emitEvents
     } = express;
 
+    if (typeof afterware !== 'function') {
+      afterware = () => (req, res, next) => next();
+    }
     if (typeof path !== 'string') {
       throw new Error(`You must provide a 'path' in your authentication configuration or pass one explicitly.`);
     }
@@ -62,6 +65,7 @@ module.exports = function init (options) {
       new Service(app, options),
       emitEvents(options, app),
       setCookie(options),
+      afterware(),
       successRedirect(),
       failureRedirect(options)
     );
